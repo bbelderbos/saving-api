@@ -8,3 +8,7 @@ class UserDoesNotExist(Exception):
 
 class DuplicatedGoal(Exception):
     pass
+
+
+class GoalDoesNotExist(Exception):
+    pass

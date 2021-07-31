@@ -16,8 +16,10 @@ class User(Model):
 class Goal(Model):
     description = fields.CharField(max_length=255)
     amount = fields.FloatField()
-    user = fields.ForeignKeyField('models.User', related_name='user',
-                                  on_delete=fields.SET_NULL)
+    user = fields.ForeignKeyField('models.User',
+                                  related_name='user',
+                                  on_delete=fields.SET_NULL,
+                                  null=True)
     achieved = fields.BooleanField(default=False)
     added = fields.DatetimeField(auto_now_add=True)
 
@@ -35,8 +37,10 @@ class TransactionType(Enum):
 class Transaction(Model):
     amount = fields.FloatField()
     transation_type = fields.CharEnumField(TransactionType)
-    goal = fields.ForeignKeyField('models.Goal', related_name='goal',
-                                  on_delete=fields.SET_NULL)
+    goal = fields.ForeignKeyField('models.Goal',
+                                  related_name='goal',
+                                  on_delete=fields.SET_NULL,
+                                  null=True)
     concept = fields.CharField(max_length=255, null=True)
     added = fields.DatetimeField(auto_now_add=True)
 

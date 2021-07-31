@@ -1,9 +1,10 @@
 import pytest
 
-from db.db import create_user, delete_user, create_goal
+from db.db import create_user, delete_user, create_goal, delete_goal
 from db.models import User, Goal
 from db.encryption import verify_password
-from db.exceptions import UserExists, UserDoesNotExist, DuplicatedGoal
+from db.exceptions import (UserExists, UserDoesNotExist,
+                           DuplicatedGoal, GoalDoesNotExist)
 
 
 @pytest.mark.asyncio
@@ -36,3 +37,15 @@ async def test_create_goal(user, goal):
     await create_goal("ipad2", 379, user)
     goal_count = await Goal.filter(user=user).count()
     assert goal_count == 2
+
+
+@pytest.mark.asyncio
+async def test_delete_goal(user, goal):
+    err = "Goal does not exist for user"
+    goal_count = await Goal.filter(user=user).count()
+    assert goal_count == 1
+    with pytest.raises(GoalDoesNotExist, match=err):
+        await delete_goal(2, user)
+    await delete_goal(1, user)
+    goal_count = await Goal.filter(user=user).count()
+    assert goal_count == 0

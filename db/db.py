@@ -5,7 +5,8 @@ from tortoise import Tortoise, run_async
 
 from .models import User, Goal, Transaction
 from .encryption import get_password_hash
-from .exceptions import UserExists, UserDoesNotExist, DuplicatedGoal
+from db.exceptions import (UserExists, UserDoesNotExist,
+                           DuplicatedGoal, GoalDoesNotExist)
 
 load_dotenv()
 
@@ -60,6 +61,16 @@ async def create_goal(description, amount, user):
             ("You already added this goal, delete it"
              " or create a new one.")
         )
+
+
+async def delete_goal(idx, user):
+    goal = await Goal.get_or_none(
+        pk=idx,
+        user=user)
+    if goal is None:
+        raise GoalDoesNotExist("Goal does not exist for user")
+    await goal.delete()
+    return None
 
 
 if __name__ == "__main__":  # pragma: no cover
