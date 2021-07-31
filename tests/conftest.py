@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from tortoise import Tortoise
 import pytest
 
-from db.db import init
+from db.db import init, create_user
 
 load_dotenv()
 
@@ -17,3 +17,16 @@ async def db():
     await init(db_url)
     yield
     await Tortoise.close_connections()
+
+
+@pytest.fixture
+def login():
+    return ("bob", "changeme")
+
+
+@pytest.fixture
+@pytest.mark.asyncio
+async def user(login):
+    username, password = login
+    user = await create_user(username, password)
+    return user
