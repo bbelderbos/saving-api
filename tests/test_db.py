@@ -1,15 +1,15 @@
 import pytest
 
-from db.db import create_user, delete_user
-from db.models import User
+from db.db import create_user, delete_user, create_goal
+from db.models import User, Goal
 from db.encryption import verify_password
-from db.exceptions import UserExists, UserDoesNotExist
+from db.exceptions import UserExists, UserDoesNotExist, DuplicatedGoal
 
 
 @pytest.mark.asyncio
 async def test_create_user(user, login):
     username, password = login
-    assert user.username == username
+    assert str(user) == username
     assert verify_password(password, user.password) is True
     err = "Username bob already exists"
     with pytest.raises(UserExists, match=err):
@@ -25,3 +25,14 @@ async def test_delete_user(user):
     assert ret is None
     user_count = await User.all().count()
     assert user_count == 0
+
+
+@pytest.mark.asyncio
+async def test_create_goal(user, goal):
+    assert goal.description == "ipad"
+    err = "You already added.*new one."
+    with pytest.raises(DuplicatedGoal, match=err):
+        await create_goal("ipad", 379, user)
+    await create_goal("ipad2", 379, user)
+    goal_count = await Goal.filter(user=user).count()
+    assert goal_count == 2

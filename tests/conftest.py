@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from tortoise import Tortoise
 import pytest
 
-from db.db import init, create_user
+from db.db import init, create_user, create_goal
 
 load_dotenv()
 
@@ -30,3 +30,10 @@ async def user(login):
     username, password = login
     user = await create_user(username, password)
     return user
+
+
+@pytest.fixture
+@pytest.mark.asyncio
+async def goal(user):
+    goal = await create_goal("ipad", 379, user)
+    return goal

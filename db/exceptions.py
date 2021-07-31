@@ -4,3 +4,7 @@ class UserExists(Exception):
 
 class UserDoesNotExist(Exception):
     pass
+
+
+class DuplicatedGoal(Exception):
+    pass
