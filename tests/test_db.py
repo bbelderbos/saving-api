@@ -5,7 +5,7 @@ import pytest
 from tortoise import Tortoise
 
 from db.db import init
-from db.models import User, Goal, Transaction
+from db.models import User
 
 load_dotenv()
 
@@ -22,11 +22,14 @@ async def db():
 
 @pytest.mark.asyncio
 async def test_create_objects(db):
-    assert await User.all().count() == 0
     await User.create(username="bob", password="changeme")
-    assert await User.all().count() == 1
+    user_count = await User.all().count()
+    assert user_count == 1
+
     user = await User.first()
     assert user.username == "bob"
     assert user.password == "changeme"
+
     await user.delete()
-    assert await User.all().count() == 0
+    user_count = await User.all().count()
+    assert user_count == 0
