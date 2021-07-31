@@ -9,7 +9,7 @@ from db.db import init, create_user
 load_dotenv()
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 @pytest.mark.asyncio
 async def db():
     db_url = os.getenv("TEST_DATABASE_URL",
