@@ -1,6 +1,9 @@
+import os
+from unittest import mock
+
 import pytest
 
-from db.db import (create_user, delete_user,
+from db.db import (init, create_user, delete_user,
                    create_goal, delete_goal,
                    amount_saved, add_transaction)
 from db.models import User, Goal, Transaction, TransactionType
@@ -8,6 +11,14 @@ from db.encryption import verify_password
 from db.exceptions import (UserExists, UserDoesNotExist,
                            DuplicatedGoal, GoalDoesNotExist,
                            InsufficientFunds)
+
+
+@pytest.mark.asyncio
+async def test_init_exception(user):
+    # https://stackoverflow.com/a/67477901
+    with mock.patch.dict(os.environ, {}, clear=True):
+        with pytest.raises(RuntimeError):
+            await init()
 
 
 @pytest.mark.asyncio
@@ -33,7 +44,7 @@ async def test_delete_user(user):
 
 @pytest.mark.asyncio
 async def test_create_goal(user, goal):
-    assert goal.description == "ipad"
+    assert str(goal) == "ipad (bob)"
     err = "You already added.*new one."
     with pytest.raises(DuplicatedGoal, match=err):
         await create_goal("ipad", 379, user)
