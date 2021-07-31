@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from tortoise import Tortoise
 import pytest
 
-from db.db import init, create_user, create_goal
+from db.db import init, create_user, create_goal, add_transaction
+from db.models import Transaction, TransactionType
 
 load_dotenv()
 
@@ -39,3 +40,20 @@ async def goal(user):
     goal = await create_goal("ipad", 379, user)
     yield goal
     await goal.delete()
+
+
+@pytest.fixture
+@pytest.mark.asyncio
+async def transactions(goal):
+    amounts = (10, 150, 125)
+    transaction_types = (
+        TransactionType.SAVING,
+        TransactionType.DONATION,
+        TransactionType.OTHER)
+    concepts = ("pocket money", "grandma", "mom and dad bday")
+    for amount, transaction_type, concept in zip(
+        amounts, transaction_types, concepts
+    ):
+        await add_transaction(goal, transaction_type, amount, concept)
+    yield
+    Transaction.all().delete()

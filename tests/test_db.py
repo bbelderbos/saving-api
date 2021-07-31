@@ -1,10 +1,13 @@
 import pytest
 
-from db.db import create_user, delete_user, create_goal, delete_goal
-from db.models import User, Goal
+from db.db import (create_user, delete_user,
+                   create_goal, delete_goal,
+                   amount_saved, add_transaction)
+from db.models import User, Goal, Transaction, TransactionType
 from db.encryption import verify_password
 from db.exceptions import (UserExists, UserDoesNotExist,
-                           DuplicatedGoal, GoalDoesNotExist)
+                           DuplicatedGoal, GoalDoesNotExist,
+                           InsufficientFunds)
 
 
 @pytest.mark.asyncio
@@ -50,3 +53,29 @@ async def test_delete_goal(user, goal):
     await delete_goal(goal.id, user)
     goal_count = await Goal.filter(user=user).count()
     assert goal_count == 0
+
+
+@pytest.mark.asyncio
+async def test_adding_transactions(goal, transactions):
+    transaction_count = await Transaction.all().count()
+    assert transaction_count == 3
+    total_saved = await amount_saved(goal)
+    assert total_saved == 285
+
+
+@pytest.mark.asyncio
+async def test_withdraw_insufficient_funds(goal, transactions):
+    err = ("Cannot withdraw - saved: 285.0, but need"
+           f" 379.0 for ipad goal.")
+    with pytest.raises(InsufficientFunds, match=err):
+        await add_transaction(goal, TransactionType.WITHDRAWAL)
+
+
+@pytest.mark.asyncio
+async def test_withdraw_sufficient_funds(goal, transactions):
+    await add_transaction(goal, TransactionType.DONATION,
+                          100, "Oli did some serious work")
+    await add_transaction(goal, TransactionType.WITHDRAWAL)
+    assert goal.achieved is True
+    total_saved = await amount_saved(goal)
+    assert total_saved == 6.0

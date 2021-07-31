@@ -12,3 +12,7 @@ class DuplicatedGoal(Exception):
 
 class GoalDoesNotExist(Exception):
     pass
+
+
+class InsufficientFunds(Exception):
+    pass

@@ -3,10 +3,13 @@ import os
 from dotenv import load_dotenv
 from tortoise import Tortoise, run_async
 
-from .models import User, Goal, Transaction
+from .models import (User, Goal,
+                     Transaction,
+                     TransactionType)
 from .encryption import get_password_hash
 from db.exceptions import (UserExists, UserDoesNotExist,
-                           DuplicatedGoal, GoalDoesNotExist)
+                           DuplicatedGoal, GoalDoesNotExist,
+                           InsufficientFunds)
 
 load_dotenv()
 
@@ -71,6 +74,36 @@ async def delete_goal(goal_id, user):
         raise GoalDoesNotExist("Goal does not exist for user")
     await goal.delete()
     return None
+
+
+async def amount_saved(goal):
+    transactions = await Transaction.filter(
+        goal=goal,
+    ).all()
+    return sum(tr.amount for tr in transactions)
+
+
+async def add_transaction(goal, transation_type,
+                          amount=0, concept=''):
+    if transation_type == TransactionType.WITHDRAWAL:
+        amount = goal.amount
+        saved = await amount_saved(goal)
+        if amount > saved:
+            raise InsufficientFunds(
+                (f"Cannot withdraw - saved: {saved}, but need"
+                 f" {amount} for {goal.description} goal."))
+        amount *= -1
+
+    transaction = await Transaction.create(
+        amount=amount,
+        transation_type=transation_type,
+        goal=goal,
+        concept=concept)
+
+    goal.achieved = True
+    await goal.save()
+
+    return transaction
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -28,15 +28,16 @@ class Goal(Model):
 
 
 class TransactionType(Enum):
-    SAVING = 1
-    DONATION = 2
-    WITHDRAWAL = 3
-    OTHER = 4
+    SAVING = "s"
+    DONATION = "d"
+    WITHDRAWAL = "w"
+    OTHER = "o"
 
 
 class Transaction(Model):
     amount = fields.FloatField()
-    transation_type = fields.CharEnumField(TransactionType)
+    transation_type = fields.CharEnumField(
+        TransactionType, default=TransactionType.SAVING)
     goal = fields.ForeignKeyField('models.Goal',
                                   related_name='goal',
                                   on_delete=fields.SET_NULL,
