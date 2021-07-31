@@ -12,3 +12,5 @@ starlette==0.14.2
 tortoise-orm==0.17.6
 typing-extensions==3.10.0.0
 uvicorn==0.14.0
+passlib==1.7.4
+bcrypt==3.2.0
