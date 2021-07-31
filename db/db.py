@@ -48,5 +48,5 @@ async def delete_user(username):
     return None
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     run_async(init())

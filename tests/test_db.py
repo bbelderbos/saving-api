@@ -7,21 +7,6 @@ from db.exceptions import UserExists, UserDoesNotExist
 
 
 @pytest.mark.asyncio
-async def test_create_objects():
-    await User.create(username="bob", password="changeme")
-    user_count = await User.all().count()
-    assert user_count == 1
-
-    user = await User.first()
-    assert user.username == "bob"
-    assert user.password == "changeme"
-
-    await user.delete()
-    user_count = await User.all().count()
-    assert user_count == 0
-
-
-@pytest.mark.asyncio
 async def test_create_user(user, login):
     username, password = login
     assert user.username == username
