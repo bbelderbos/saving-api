@@ -12,6 +12,7 @@ async def init(db_url=None):
         if db_url is None:
             raise RuntimeError("Please specify a DB")
 
+    print(db_url)
     await Tortoise.init(
         db_url=db_url,
         modules={'models': ['db.models']}
