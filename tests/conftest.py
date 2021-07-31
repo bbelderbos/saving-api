@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 from dotenv import load_dotenv
@@ -9,7 +10,12 @@ from db.db import init, create_user, create_goal
 load_dotenv()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session")
+def event_loop():
+    return asyncio.get_event_loop()
+
+
+@pytest.fixture(autouse=True, scope="session")
 @pytest.mark.asyncio
 async def db():
     db_url = os.getenv("TEST_DATABASE_URL",
@@ -20,20 +26,16 @@ async def db():
 
 
 @pytest.fixture
-def login():
-    return ("bob", "changeme")
-
-
-@pytest.fixture
 @pytest.mark.asyncio
-async def user(login):
-    username, password = login
-    user = await create_user(username, password)
-    return user
+async def user():
+    user = await create_user("bob", "changeme")
+    yield user
+    await user.delete()
 
 
 @pytest.fixture
 @pytest.mark.asyncio
 async def goal(user):
     goal = await create_goal("ipad", 379, user)
-    return goal
+    yield goal
+    await goal.delete()

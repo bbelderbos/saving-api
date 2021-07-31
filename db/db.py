@@ -63,9 +63,9 @@ async def create_goal(description, amount, user):
         )
 
 
-async def delete_goal(idx, user):
+async def delete_goal(goal_id, user):
     goal = await Goal.get_or_none(
-        pk=idx,
+        pk=goal_id,
         user=user)
     if goal is None:
         raise GoalDoesNotExist("Goal does not exist for user")

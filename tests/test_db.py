@@ -8,13 +8,13 @@ from db.exceptions import (UserExists, UserDoesNotExist,
 
 
 @pytest.mark.asyncio
-async def test_create_user(user, login):
-    username, password = login
+async def test_create_user(user):
+    username = "bob"
     assert str(user) == username
-    assert verify_password(password, user.password) is True
+    assert verify_password("changeme", user.password) is True
     err = "Username bob already exists"
     with pytest.raises(UserExists, match=err):
-        await create_user(username, password)
+        await create_user(username, "some_pass")
 
 
 @pytest.mark.asyncio
@@ -45,7 +45,8 @@ async def test_delete_goal(user, goal):
     goal_count = await Goal.filter(user=user).count()
     assert goal_count == 1
     with pytest.raises(GoalDoesNotExist, match=err):
-        await delete_goal(2, user)
-    await delete_goal(1, user)
+        other_goal_id = goal.id + 1
+        await delete_goal(other_goal_id, user)
+    await delete_goal(goal.id, user)
     goal_count = await Goal.filter(user=user).count()
     assert goal_count == 0
