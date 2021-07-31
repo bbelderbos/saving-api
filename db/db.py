@@ -87,10 +87,10 @@ async def add_transaction(goal, transation_type,
                           amount=0, concept=''):
     if transation_type == TransactionType.WITHDRAWAL:
         amount = goal.amount
-        saved = await amount_saved(goal)
-        if amount > saved:
+        total_saved = await amount_saved(goal)
+        if amount > total_saved:
             raise InsufficientFunds(
-                (f"Cannot withdraw - saved: {saved}, but need"
+                (f"Cannot withdraw - saved: {total_saved}, but need"
                  f" {amount} for {goal.description} goal."))
         amount *= -1
 

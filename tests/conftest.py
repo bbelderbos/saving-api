@@ -56,4 +56,4 @@ async def transactions(goal):
     ):
         await add_transaction(goal, transaction_type, amount, concept)
     yield
-    Transaction.all().delete()
+    await Transaction.all().delete()

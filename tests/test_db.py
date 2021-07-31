@@ -66,7 +66,7 @@ async def test_adding_transactions(goal, transactions):
 @pytest.mark.asyncio
 async def test_withdraw_insufficient_funds(goal, transactions):
     err = ("Cannot withdraw - saved: 285.0, but need"
-           f" 379.0 for ipad goal.")
+           " 379.0 for ipad goal.")
     with pytest.raises(InsufficientFunds, match=err):
         await add_transaction(goal, TransactionType.WITHDRAWAL)
 
@@ -79,3 +79,13 @@ async def test_withdraw_sufficient_funds(goal, transactions):
     assert goal.achieved is True
     total_saved = await amount_saved(goal)
     assert total_saved == 6.0
+    transactions = await Transaction.all()
+    actual = [str(tr) for tr in transactions]
+    expected = [
+        "10.0 (TransactionType.SAVING)",
+        "150.0 (TransactionType.DONATION)",
+        "125.0 (TransactionType.OTHER)",
+        "100.0 (TransactionType.DONATION)",
+        "-379.0 (TransactionType.WITHDRAWAL)",
+    ]
+    assert actual == expected
