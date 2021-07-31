@@ -93,6 +93,7 @@ async def add_transaction(goal, transation_type,
                 (f"Cannot withdraw - saved: {total_saved}, but need"
                  f" {amount} for {goal.description} goal."))
         amount *= -1
+        concept = f"withdrawal for {goal.description} goal"
 
     transaction = await Transaction.create(
         amount=amount,

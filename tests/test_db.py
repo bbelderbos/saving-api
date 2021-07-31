@@ -89,3 +89,4 @@ async def test_withdraw_sufficient_funds(goal, transactions):
         "-379.0 (TransactionType.WITHDRAWAL)",
     ]
     assert actual == expected
+    assert transactions[-1].concept == "withdrawal for ipad goal"
